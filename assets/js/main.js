@@ -1,39 +1,108 @@
-// Check if the user has a theme preference in local storage
-const theme = localStorage.getItem('theme');
-if (theme) {
-    document.documentElement.setAttribute('data-bs-theme', theme);
-    if (theme === 'dark') {
-        document.getElementById('themeSwitch').checked = true;
-        document.querySelector('.form-check-label').innerHTML = '<i class="bx bx-moon"></i>';
+/**
+ * Personal Website - Main JavaScript
+ */
+
+(function () {
+    'use strict';
+
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+    const sidebar = document.getElementById('sidebar-mobile');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+    const currentYearEl = document.getElementById('current-year');
+
+    function init() {
+        initTheme();
+        initSidebar();
+        initCurrentYear();
+        initActiveLink();
     }
-}
 
-// Function to toggle between light and dark modes
-function toggleMode() {
-    const htmlElement = document.documentElement;
-    const themeSwitchLabel = document.querySelector('.form-check-label');
-    const isChecked = document.getElementById('themeSwitch').checked;
+    // Theme
+    function initTheme() {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-    if (isChecked) {
-        // Switch to dark mode
-        htmlElement.setAttribute('data-bs-theme', 'dark');
-        themeSwitchLabel.innerHTML = '<i class="bx bx-moon"></i>';
-        // Save the theme preference in local storage
-        localStorage.setItem('theme', 'dark');
+        if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+        if (themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
+    }
+
+    function toggleTheme() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    // Sidebar
+    function initSidebar() {
+        if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) closeSidebar();
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSidebar();
+        });
+    }
+
+    function openSidebar() {
+        if (sidebar) sidebar.classList.remove('-translate-x-full');
+        if (overlay) overlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.add('-translate-x-full');
+        if (overlay) overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    // Active link
+    function initActiveLink() {
+        const sections = document.querySelectorAll('section[id]');
+
+        function update() {
+            const scrollY = window.scrollY;
+            sections.forEach(section => {
+                const top = section.offsetTop - 100;
+                const height = section.offsetHeight;
+                const id = section.getAttribute('id');
+
+                document.querySelectorAll(`.sidebar-link[href="#${id}"]`).forEach(link => {
+                    if (scrollY >= top && scrollY < top + height) {
+                        link.style.color = '#14b8a6';
+                        link.classList.add('font-medium');
+                    } else {
+                        link.style.color = '';
+                        link.classList.remove('font-medium');
+                    }
+                });
+            });
+        }
+
+        window.addEventListener('scroll', update);
+        update();
+    }
+
+    // Year
+    function initCurrentYear() {
+        if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        // Switch to light mode
-        htmlElement.setAttribute('data-bs-theme', 'light');
-        themeSwitchLabel.innerHTML = '<i class="bx bx-sun"></i>';
-        // Save the theme preference in local storage
-        localStorage.setItem('theme', 'light');
+        init();
     }
-}
-
-/*=============== SHOW SCROLL UP ===============*/ 
-const scrollUp = () =>{
-	const scrollUp = document.getElementById('scroll-up')
-    // When the scroll is higher than 350 viewport height, add the show-scroll class to the a tag with the scrollup class
-	this.scrollY >= 350 ? scrollUp.classList.add('show-scroll')
-						: scrollUp.classList.remove('show-scroll')
-}
-window.addEventListener('scroll', scrollUp)
+})();
