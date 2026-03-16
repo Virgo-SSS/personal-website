@@ -84,11 +84,19 @@ const initCurrentYear = () => {
     if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 };
 
+const initFancybox = () => {
+    if (typeof Fancybox === 'undefined') return;
+    Fancybox.bind('[data-fancybox]', {
+        Images: { zoom: true },
+    });
+};
+
 const init = () => {
     initTheme();
     initSidebar();
     initCurrentYear();
     initActiveLink();
+    initFancybox();
 };
 
 init();

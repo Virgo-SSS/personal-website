@@ -65,6 +65,11 @@ button:focus-visible {
     background: #30363d;
 }
 
+/* ===== Fancybox Lightbox ===== */
+[data-fancybox] {
+    cursor: zoom-in;
+}
+
 /* ===== Print Styles ===== */
 @media print {
     aside,
