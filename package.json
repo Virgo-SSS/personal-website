@@ -1,0 +1,20 @@
+{
+  "name": "personal-website",
+  "version": "1.0.0",
+  "description": "Virgo Stevanus personal website",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --minify",
+    "dev": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Virgo-SSS/personal-website.git"
+  },
+  "author": "Virgo Stevanus",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "tailwindcss": "^4.2.4"
+  }
+}
