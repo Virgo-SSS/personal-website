@@ -84,11 +84,44 @@ const initCurrentYear = () => {
     if (currentYearEl) currentYearEl.textContent = new Date().getFullYear();
 };
 
+const FANCYBOX_CSS = 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css';
+const FANCYBOX_JS = 'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js';
+
+const loadStylesheet = (href) => new Promise((resolve, reject) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.onload = resolve;
+    link.onerror = reject;
+    document.head.appendChild(link);
+});
+
+const loadScript = (src) => new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+});
+
+let fancyboxLoading = null;
+const ensureFancybox = () => {
+    if (typeof Fancybox !== 'undefined') return Promise.resolve();
+    if (fancyboxLoading) return fancyboxLoading;
+    fancyboxLoading = Promise.all([loadStylesheet(FANCYBOX_CSS), loadScript(FANCYBOX_JS)])
+        .then(() => Fancybox.bind('[data-fancybox]', { Images: { zoom: true } }));
+    return fancyboxLoading;
+};
+
 const initFancybox = () => {
-    if (typeof Fancybox === 'undefined') return;
-    Fancybox.bind('[data-fancybox]', {
-        Images: { zoom: true },
-    });
+    document.addEventListener('click', async (e) => {
+        const trigger = e.target.closest('[data-fancybox]');
+        if (!trigger) return;
+        if (typeof Fancybox !== 'undefined') return;
+        e.preventDefault();
+        await ensureFancybox();
+        trigger.click();
+    }, true);
 };
 
 const init = () => {
